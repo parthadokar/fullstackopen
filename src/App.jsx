@@ -1,47 +1,57 @@
-import Note from './Components/Note'
 import { useState } from 'react'
 
-const App = (props) => {
-  const [notes,setNotes] = useState(props.notes)
-  const [newNote,setNewNote] = useState(
-    'a new note...'
-  )
-  const[showAll,setShowAll] = useState(true)
-  const addNote = (event) => {
+const App = () => {
+  const [persons, setPersons] = useState([
+    { name: 'Arto Hellas', number: '040-123456', id: 1 },
+    { name: 'Ada Lovelace', number: '39-44-5323523', id: 2 },
+    { name: 'Dan Abramov', number: '12-43-234345', id: 3 },
+    { name: 'Mary Poppendieck', number: '39-23-6423122', id: 4 }
+  ])
+  const [newName, setNewName] = useState('')
+  const [newNumber,setNewNumber] = useState('')
+  const [filterName,setFilterName] = useState('')
+
+  const addPerson = (event) => {
     event.preventDefault()
-    const noteObject = {
-      content:newNote,
-      important: Math.random() < 0.5,
-      id: String(notes.length + 1)
+    const duplicate = persons.some(person => person.name === newName)
+    if (duplicate) {
+      alert(`${newName} is already added to phonebook`)
     }
-    setNotes(notes.concat(noteObject))
-    setNewNote('')
-  }
-  
-  const handleNoteChange = (event) => {
-    console.log(event.target.value)
-    setNewNote(event.target.value)
+    const personObject = { name:newName,number:newNumber,id:persons.length+1 }
+    setPersons(persons.concat(personObject))
+    setNewName('')
+    setNewNumber('')
   }
 
-  const notesToShow = showAll ? notes : notes.filter(note => note.important === true)
+  const filteredPersons = persons.filter(person =>
+    person.name.toLowerCase().includes(filterName.toLowerCase())
+  )
 
   return (
     <div>
-      <h1>Notes</h1>
+      <h2>Phonebook</h2>
       <div>
-        <button onClick={() => setShowAll(!showAll)}>
-          show {showAll ? 'important' : 'all'}
-        </button>
+        filter : <input onChange={(e) => setFilterName(e.target.value)}></input>
       </div>
-      <ul>
-        {notesToShow.map((note) => (
-          <Note key={note.id} note={note} />
-        ))}
-      </ul>
-      <form onSubmit={addNote}>
-        <input value={newNote} onChange={handleNoteChange}/>
-        <button type='submit'>save</button>
+      <h2>Add New Contact</h2>
+      <form onSubmit={addPerson}>
+        <div>
+          name: <input value={newName} onChange={(e) => setNewName(e.target.value)}/>
+        </div>
+        <div>number: <input value={newNumber} onChange={(e) => setNewNumber(e.target.value)}/>
+        </div>
+        <div>
+          <button type="submit">add</button>
+          
+        </div>
       </form>
+      <h2>Numbers</h2>
+      {filteredPersons.map(person =>
+        <p key={person.name}>{person.name} {person.number}</p>
+      )}
+      <div>
+        debug: {newName}
+      </div>
     </div>
   )
 }
